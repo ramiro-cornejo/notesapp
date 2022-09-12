@@ -11,6 +11,7 @@ type Note = {
 
 type NoteCardProps = {
   note: Note;
+  onArchive: (id:Note['id']) => void
 };
 
 const api = {
@@ -23,13 +24,21 @@ const api = {
         archived: false,
         content: "Contenido",
         categories: ["random"],
+      },
+      {
+        id: "nota2",
+        title: "Titulo",
+        lastEdited: "15/09/2022",
+        archived: false,
+        content: "Contenido",
+        categories: ["random"],
       }
     ],
   },
 };
 
 
-function NoteCard({note}: NoteCardProps) {
+function NoteCard({note, onArchive}: NoteCardProps) {
   return (
     <div className="nes-container with-title">
       <div>
@@ -37,8 +46,8 @@ function NoteCard({note}: NoteCardProps) {
         <p>Last edited: {note.lastEdited}</p>
       </div>
       
-      <div>
-        <button className="nes-btn">Archivar</button>
+      <div style={{display: "flex", gap: 12}}>
+        <button className="nes-btn" onClick={() => onArchive(note.id)}>Archivar: {String(note.archived)}</button>
         <button className="nes-btn">Editar</button>
         <button className="nes-btn">Borrar</button>
       </div>
@@ -48,17 +57,38 @@ function NoteCard({note}: NoteCardProps) {
 }
 
 function App() {
-  const [notes, setNotes] = useState<Note[]>(() => api.notes.list());
+  const [notes , setNotes] = useState<Note[]>(() => api.notes.list());
+
+  function handleArchive(id: Note["id"]){
+    setNotes((notes) =>
+    notes.map((note) => {
+      if (note.id !== id) return note;
+
+      return {
+        ...note,
+        archived: !note.archived,
+      };
+    }),
+    );
+  }
+
   return (
     <main>
-      <div>
+      <div style={{marginBottom: 24}}>
         <h1>Mis Notas</h1>
         <button className="nes-btn">Crear nota</button>
       </div>
       
-      {notes.map((note) => (
-        <NoteCard key={note.id} note={note}/>
-      ))}
+      <div style={{
+        display: "grid", 
+        gap: 24, 
+        gridTemplateColumns: "repeat(auto-fill, minmax(480px, 1fr))",
+        }}
+        >
+        {notes.map((note) => (
+          <NoteCard onArchive={handleArchive} key={note.id} note={note}/>
+        ))}
+      </div>
     </main>
   )
 }
