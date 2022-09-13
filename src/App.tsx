@@ -11,7 +11,8 @@ type Note = {
 
 type NoteCardProps = {
   note: Note;
-  onArchive: (id:Note['id']) => void
+  onArchive: (id:Note['id']) => void;
+  onDelete: (id:Note['id']) => void;
 };
 
 const api = {
@@ -19,7 +20,7 @@ const api = {
     list: () => [
       {
         id: "nota",
-        title: "Titulo",
+        title: "Primera nota",
         lastEdited: "12/09/2022",
         archived: false,
         content: "Contenido",
@@ -27,7 +28,7 @@ const api = {
       },
       {
         id: "nota2",
-        title: "Titulo",
+        title: "Segunda nota",
         lastEdited: "15/09/2022",
         archived: false,
         content: "Contenido",
@@ -38,7 +39,7 @@ const api = {
 };
 
 
-function NoteCard({note, onArchive}: NoteCardProps) {
+function NoteCard({note, onArchive, onDelete}: NoteCardProps) {
   return (
     <div className="nes-container with-title">
       <div>
@@ -47,9 +48,9 @@ function NoteCard({note, onArchive}: NoteCardProps) {
       </div>
       
       <div style={{display: "flex", gap: 12}}>
-        <button className="nes-btn" onClick={() => onArchive(note.id)}>Archivar: {String(note.archived)}</button>
+        <button className="nes-btn" onClick={() => onArchive(note.id)}>Archivar</button>
         <button className="nes-btn">Editar</button>
-        <button className="nes-btn">Borrar</button>
+        <button className="nes-btn" onClick={() => onDelete(note.id)}>Borrar</button>
       </div>
     </div>
 
@@ -58,6 +59,10 @@ function NoteCard({note, onArchive}: NoteCardProps) {
 
 function App() {
   const [notes , setNotes] = useState<Note[]>(() => api.notes.list());
+
+  function handleDelete(id: Note["id"]) {
+    setNotes((notes) => notes.filter((note) => note.id !== id))
+  }
 
   function handleArchive(id: Note["id"]){
     setNotes((notes) =>
@@ -86,7 +91,7 @@ function App() {
         }}
         >
         {notes.map((note) => (
-          <NoteCard onArchive={handleArchive} key={note.id} note={note}/>
+          <NoteCard onDelete={handleDelete} onArchive={handleArchive} key={note.id} note={note}/>
         ))}
       </div>
     </main>
